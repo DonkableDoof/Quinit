@@ -9,7 +9,9 @@ Quinit is an easy to use module loader for Roblox Luau. It allows you to cache a
 const Quinit = require(ReplicatedStorage.Packages.Quinit)
 local moduleFolder = path.to.modules
 
-Quinit._Init(moduleFolder:GetChildren())
+Quinit._Init(moduleFolder.Module1, 1) <- Set a run priority
+Quinit._Init(moduleFolder.Module2, 2)
+Quinit._Init(moduleFolder.ChildFolder:GetChildren())
 Quinit._Start()
 ```
 
