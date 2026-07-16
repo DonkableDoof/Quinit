@@ -34,6 +34,9 @@ end
 function Service._OnHeartbeat()
 end
 
+function Service._OnPreRender(deltaTime: number) -- Client only
+end
+
 return Service
 ```
 
@@ -42,3 +45,4 @@ When you send a module through Quinit, the following functions will run automati
 - _OnPlayerRemoving -> When a player leaves the game
 - _OnCharacterAdded -> When a player character is loaded
 - _OnHeartbeat -> Runs on every RunService Heartbeat
+- _OnPreRender -> Runs before every rendered frame (Client only)
