@@ -34,6 +34,10 @@ end
 function Service._OnHeartbeat()
 end
 
+-- CLIENT ONLY
+function Service._OnPreRender(deltaTime: number)
+end
+
 return Service
 ```
 
