@@ -2,12 +2,13 @@
 const RunService = game:GetService("RunService")
 const Players = game:GetService("Players")
 const ReplicatedStorage = game:GetService("ReplicatedStorage")
-const Data = require(ReplicatedStorage.Data)
+--const Data = require(ReplicatedStorage.Data) -- UN-COMMENT THESE LINES IF USING LEIF DATASERVICETYPED
 
 local CachedModules = {}
 local ModulePriorities = {}
 
 local connections = {} :: {[Player]: RBXScriptConnection}
+local dispatchedCharacters = setmetatable({}, {__mode = 'k'})
 
 
 
@@ -29,6 +30,29 @@ end
 
 --\\ QUINIT //--
 local Quinit = {}
+
+local function bindPlayer(player: Player)
+	if connections[player] then return end
+
+	local function dispatchCharacter(character: Model)
+		if dispatchedCharacters[character] then return end
+		dispatchedCharacters[character] = true
+
+		--Data.Server.Service:waitForData(player)
+		Quinit._OnCharacterAdded(character, player)
+	end
+
+	connections[player] = player.CharacterAdded:Connect(function(character: Model)
+		task.spawn(dispatchCharacter, character)
+	end)
+
+	--Data.Server.Service:waitForData(player)
+	Quinit._OnPlayerAdded(player)
+
+	if player.Character then
+		task.spawn(dispatchCharacter, player.Character)
+	end
+end
 
 
 function Quinit.Get(name: string)
@@ -56,21 +80,13 @@ function Quinit._Start()
 			task.spawn(entry.module._Start)
 		end
 	end
-	
+
 	if RunService:IsServer() then
 		for _, player in ipairs(Players:GetPlayers()) do
-			task.spawn(Quinit._OnPlayerAdded, player)
-			if player.Character then
-				task.spawn(Quinit._OnCharacterAdded, player.Character, player)
-			end
+			task.spawn(bindPlayer, player)
 		end
 		Players.PlayerAdded:Connect(function(player)
-			Data.Server.Service:waitForData(player)
-			Quinit._OnPlayerAdded(player)
-
-			connections[player] = player.CharacterAdded:Connect(function(character: Model)
-				Quinit._OnCharacterAdded(character, player)
-			end)
+			task.spawn(bindPlayer, player)
 		end)
 		Players.PlayerRemoving:Connect(function(player: Player)
 			task.spawn(Quinit._OnPlayerRemoving, player)
@@ -108,8 +124,8 @@ function Quinit._Start()
 			task.spawn(Quinit._OnCharacterAdded, character, player)
 		end
 	end
-	
-	
+
+
 	local heartbeatCount = 0
 	for _, entry in getOrderedModules() do
 		if typeof(entry.module._OnHeartbeat) == 'function' then
