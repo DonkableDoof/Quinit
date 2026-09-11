@@ -46,3 +46,4 @@ When you send a module through Quinit, the following functions will run automati
 - _OnPlayerRemoving -> When a player leaves the game
 - _OnCharacterAdded -> When a player character is loaded
 - _OnHeartbeat -> Runs on every RunService Heartbeat
+- _OnPreRender -> Client only. Fires every frame before the frame is rendered
