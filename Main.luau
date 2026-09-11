@@ -123,6 +123,10 @@ function Quinit._Start()
 			local character = player.Character or player.CharacterAdded:Wait()
 			task.spawn(Quinit._OnCharacterAdded, character, player)
 		end
+		
+		RunService.PreRender:Connect(function(deltaTime: number)
+			task.spawn(Quinit._OnPreRender, deltaTime)
+		end)
 	end
 
 
@@ -169,6 +173,16 @@ function Quinit._OnHeartbeat()
 	for _, entry in getOrderedModules() do
 		if typeof(entry.module._OnHeartbeat) == 'function' then
 			task.spawn(entry.module._OnHeartbeat)
+		end
+	end
+end
+
+
+-- CLIENT ONLY!
+function Quinit._OnPreRender(deltaTime: number)
+	for _, entry in getOrderedModules() do
+		if typeof(entry.module._OnPreRender) == 'function' then
+			task.spawn(entry.module._OnPreRender, deltaTime)
 		end
 	end
 end
